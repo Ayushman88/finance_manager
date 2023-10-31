@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <title>Personal Finance Manager</title>
+  </head>
+  <body>
+    <h1>Personal Finance Manager</h1>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/reports">Reports</a></li>
+        <li><a href="/about">About Us</a></li>
+        <li><a href="/settings">Settings</a></li>
+      </ul>
+    </nav>
+
+    <h2>Dashboard</h2>
+    <p>Total Expense: ${{ total_expense }}</p>
+    <p>Total Income: ${{ total_income }}</p>
+    <p>Remaining Budget: ${{ remaining_budget }}</p>
+
+    <h3>Expenses</h3>
+    <form method="post" action="/add_expense">
+      <label for="expense_category">Category:</label>
+      <select name="expense_category">
+        <option value="Food">Food</option>
+        <option value="Housing">Housing</option>
+        <!-- Add more categories as needed -->
+      </select>
+      <label for="expense_amount">Amount:</label>
+      <input type="number" name="expense_amount" />
+      <button type="submit">Add Expense</button>
+    </form>
+    <ul>
+      {% for expense in expenses %}
+      <li>{{ expense.category }} - ${{ expense.amount }}</li>
+      {% endfor %}
+    </ul>
+
+    <h3>Income</h3>
+    <form method="post" action="/add_income">
+      <label for="income_source">Source:</label>
+      <input type="text" name="income_source" />
+      <label for="income_amount">Amount:</label>
+      <input type="number" name="income_amount" />
+      <button type="submit">Add Income</button>
+    </form>
+    <ul>
+      {% for income in incomes %}
+      <li>{{ income.source }} - ${{ income.amount }}</li>
+      {% endfor %}
+    </ul>
+
+    <h3>Budget</h3>
+    <form method="post" action="/set_budget">
+      <label for="budget_category">Category:</label>
+      <input type="text" name="budget_category" />
+      <label for="budget_amount">Amount:</label>
+      <input type="number" name="budget_amount" />
+      <button type="submit">Set Budget</button>
+    </form>
+    <ul>
+      {% for budget in budgets %}
+      <li>{{ budget.category }} - ${{ budget.amount }}</li>
+      {% endfor %}
+    </ul>
+
+    <h3>Reminders</h3>
+    <form method="post" action="/set_reminder">
+      <label for="reminder_description">Description:</label>
+      <input type="text" name="reminder_description" />
+      <label for="reminder_date">Date:</label>
+      <input type="date" name="reminder_date" />
+      <button type="submit">Set Reminder</button>
+    </form>
+    <ul>
+      {% for reminder in reminders %}
+      <li>{{ reminder.description }} - {{ reminder.date }}</li>
+      {% endfor %}
+    </ul>
+    <script>
+    // Function to handle form submission for all sections
+    function handleFormSubmission(formId, listId, itemName, itemValue) {
+        document.getElementById(formId).addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const category = document.querySelector(`#${formId} select[name="${itemName}_category"]`).value;
+            const value = document.querySelector(`#${formId} input[name="${itemName}_${itemValue}"]`).value;
+
+            // Add the new item to the list
+            const itemList = document.getElementById(listId);
+            const newItem = document.createElement('li');
+            newItem.innerHTML = `${category} - $${value} <button onclick="removeItem(this)">Remove</button>`;
+            itemList.appendChild(newItem);
+
+            // Clear the form fields
+            document.querySelector(`#${formId} select[name="${itemName}_category"]`).value = 'Food';
+            document.querySelector(`#${formId} input[name="${itemName}_${itemValue}"]`).value = '';
+        });
+    }
+
+    // Function to remove an item
+    function removeItem(button) {
+        const item = button.parentNode;
+        item.remove();
+    }
+
+    // Apply the form submission and removal functions to all sections
+    handleFormSubmission('expense-form', 'expense-list', 'expense', 'amount');
+    handleFormSubmission('income-form', 'income-list', 'income', 'amount');
+    handleFormSubmission('budget-form', 'budget-list', 'budget', 'amount');
+    handleFormSubmission('reminder-form', 'reminder-list', 'reminder', 'date');
+</script>
+</body>
+</html>
+
+  </body>
+</html>
